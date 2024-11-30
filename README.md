@@ -1,12 +1,12 @@
 # liblvgl
 
-LVGL (Light and Versatile Graphics Library) es una biblioteca gráfica gratuita y de código abierto que proporciona todo lo necesario para crear interfaces de usuario visualmente atractivas y de alto rendimiento en dispositivos embebidos.
+LVGL (Light and Versatile Graphics Library) is a free and open-source graphics library that provides everything you need to create visually appealing and high-performance user interfaces on embedded devices.
 
-## Descripción
+## Description
 
-Este proyecto empaqueta la biblioteca LVGL versión 9.2.2 para su instalación y uso en sistemas basados en Linux. Incluye parches personalizados para mejorar la compatibilidad y funcionalidad.
+This project packages the LVGL library version 9.2.2 for installation and use on Linux-based systems. It includes custom patches to improve compatibility and functionality.
 
-## Requisitos
+## Requirements
 
 - `libdrm`
 - `libinput`
@@ -17,17 +17,17 @@ Este proyecto empaqueta la biblioteca LVGL versión 9.2.2 para su instalación y
 - `git`
 - `ffmpeg-dev`
 
-## Instalación
+## Installation
 
-Para compilar e instalar la biblioteca, siga estos pasos:
+To build and install the library, follow these steps:
 
-1. Clone el repositorio y navegue al directorio del proyecto:
+1. Clone the repository and navigate to the project directory:
     ```sh
     git clone https://github.com/serper/liblvgl.git
     cd liblvgl
     ```
 
-2. Descargue las fuentes y aplique los parches:
+2. Download the sources and apply the patches:
     ```sh
     wget https://github.com/lvgl/lvgl/archive/refs/tags/v9.2.2.tar.gz -O liblvgl-9.2.2.tar.gz
     tar -xzf liblvgl-9.2.2.tar.gz
@@ -37,7 +37,7 @@ Para compilar e instalar la biblioteca, siga estos pasos:
     patch -p1 < fix-lv_blend_neon.S.patch
     ```
 
-3. Compile e instale la biblioteca:
+3. Build and install the library:
     ```sh
     mkdir build
     cd build
@@ -46,35 +46,35 @@ Para compilar e instalar la biblioteca, siga estos pasos:
     sudo make install
     ```
 
-## Creación del paquete APK para Alpine Linux
+## Creating the APK package for Alpine Linux
 
-Para crear el paquete APK para Alpine Linux, siga estos pasos:
+To create the APK package for Alpine Linux, follow these steps:
 
-1. Asegúrese de tener `abuild` instalado y configurado en su sistema.
+1. Ensure you have `abuild` installed and configured on your system.
 
-2. Ejecute los siguientes comandos en el directorio del proyecto:
+2. Run the following commands in the project directory:
     ```sh
     abuild checksum
     abuild -r
     ```
 
-## Uso
+## Usage
 
-Después de la instalación, puede incluir LVGL en su proyecto C/C++ y comenzar a desarrollar interfaces gráficas.
+After installation, you can include LVGL in your C/C++ project and start developing graphical interfaces.
 
-## Contribuciones
+## Contributions
 
-Las contribuciones son bienvenidas. Por favor, abra un issue o un pull request en GitHub.
+Contributions are welcome. Please open an issue or a pull request on GitHub.
 
-## Licencia
+## License
 
-Este proyecto está licenciado bajo la Licencia MIT. Consulte el archivo `LICENSE` para más detalles.
+This project is licensed under the MIT License. See the `LICENSE` file for details.
 
-## Mantenedor
+## Maintainer
 
 - Sergio Perez ([serper](https://github.com/serper))
 
-## Enlaces
+## Links
 
-- [Sitio web de LVGL](https://lvgl.io)
-- [Repositorio de GitHub de LVGL](https://github.com/lvgl/lvgl)
+- [LVGL Website](https://lvgl.io)
+- [LVGL GitHub Repository](https://github.com/lvgl/lvgl)
