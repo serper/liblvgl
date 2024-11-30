@@ -1,0 +1,84 @@
+--- lvgl/env_support/cmake/custom.cmake	2024-11-02 16:59:47.170760486 +0000
++++ lvgl-orig/env_support/cmake/custom.cmake	2024-11-03 01:53:39.573866003 +0000
+@@ -14,8 +14,8 @@
+     get_filename_component(LV_CONF_DIR ${LV_CONF_PATH} DIRECTORY)
+ endif( LV_CONF_PATH )
+ 
+-# Option to build shared libraries (as opposed to static), default: OFF
+-option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
++# Option to build shared libraries (as opposed to static), default: ON
++option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+ 
+ # Set sources used for LVGL components
+ file(GLOB_RECURSE SOURCES ${LVGL_ROOT_DIR}/src/*.c ${LVGL_ROOT_DIR}/src/*.S)
+@@ -24,12 +24,16 @@
+ file(GLOB_RECURSE THORVG_SOURCES ${LVGL_ROOT_DIR}/src/libs/thorvg/*.cpp ${LVGL_ROOT_DIR}/src/others/vg_lite_tvg/*.cpp)
+ 
+ # Build LVGL library
+-add_library(lvgl ${SOURCES})
++add_library(lvgl SHARED ${SOURCES})
+ add_library(lvgl::lvgl ALIAS lvgl)
+ 
++# Ensure -fPIC is used
++set_target_properties(lvgl PROPERTIES POSITION_INDEPENDENT_CODE ON)
++
+ target_compile_definitions(
+   lvgl PUBLIC $<$<BOOL:${LV_LVGL_H_INCLUDE_SIMPLE}>:LV_LVGL_H_INCLUDE_SIMPLE>
+-              $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>)
++              $<$<BOOL:${LV_CONF_INCLUDE_SIMPLE}>:LV_CONF_INCLUDE_SIMPLE>
++              $<$<COMPILE_LANGUAGE:ASM>:__ASSEMBLY__>)
+ 
+ # Add definition of LV_CONF_PATH only if needed
+ if(LV_CONF_PATH)
+@@ -44,12 +48,22 @@
+ # Include root and optional parent path of LV_CONF_PATH
+ target_include_directories(lvgl SYSTEM PUBLIC ${LVGL_ROOT_DIR} ${LV_CONF_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+ 
+-
+ if(NOT LV_CONF_BUILD_DISABLE_THORVG_INTERNAL)
+-    add_library(lvgl_thorvg ${THORVG_SOURCES})
++    add_library(lvgl_thorvg SHARED ${THORVG_SOURCES})
+     add_library(lvgl::thorvg ALIAS lvgl_thorvg)
+     target_include_directories(lvgl_thorvg SYSTEM PUBLIC ${LVGL_ROOT_DIR}/src/libs/thorvg)
+-    target_link_libraries(lvgl_thorvg PUBLIC lvgl)
++    target_link_libraries(lvgl PUBLIC lvgl_thorvg)  # Enlazar lvgl con lvgl_thorvg
++endif()
++
++if (CMAKE_SYSTEM_PROCESSOR MATCHES "Darwin")
++  # Usar las variables de inclusión y enlace de SDL2 si están definidas
++  if(LVGL_SDL_INCLUDE_DIR AND LVGL_SDL_LIBRARY)
++      message(STATUS "Librería SDL2 encontrada en ${LVGL_SDL_INCLUDE_DIR}")
++      include_directories(${LVGL_SDL_INCLUDE_DIR})
++      link_directories(${LVGL_SDL_LIBRARY})
++  else()
++      message(FATAL_ERROR "No se encontró la librería SDL2")
++  endif()
+ endif()
+ 
+ if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
+@@ -130,9 +144,8 @@
+     PATTERN "*.h")
+ endif()
+ 
+-
+-configure_file("${LVGL_ROOT_DIR}/lvgl.pc.in" lvgl.pc @ONLY)
+-configure_file("${LVGL_ROOT_DIR}/lv_version.h.in" lv_version.h @ONLY)
++configure_file("${LVGL_ROOT_DIR}/lvgl.pc.in" ${CMAKE_BINARY_DIR}/lvgl.pc @ONLY)
++configure_file("${LVGL_ROOT_DIR}/lv_version.h.in" ${CMAKE_BINARY_DIR}/lv_version.h @ONLY)
+ 
+ install(
+   FILES "${CMAKE_CURRENT_BINARY_DIR}/lvgl.pc"
+@@ -197,7 +210,7 @@
+     PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+ endif()
+ 
+-#install library examples
++# Install library examples
+ if(NOT LV_CONF_BUILD_DISABLE_EXAMPLES)
+   set_target_properties(
+     lvgl_examples
+@@ -216,3 +229,4 @@
+     RUNTIME DESTINATION "${RUNTIME_INSTALL_DIR}"
+     PUBLIC_HEADER DESTINATION "${INC_INSTALL_DIR}")
+ endif()
++

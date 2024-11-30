@@ -1,0 +1,52 @@
+--- lvgl/src/indev/lv_indev.c	2024-10-28 16:03:41.119881732 +0000
++++ lvgl-orig/src/indev/lv_indev.c	2024-10-29 16:10:38.774743925 +0000
+@@ -687,15 +687,35 @@
+     i->pointer.last_raw_point.x = data->point.x;
+     i->pointer.last_raw_point.y = data->point.y;
+ 
+-    if(disp->rotation == LV_DISPLAY_ROTATION_180 || disp->rotation == LV_DISPLAY_ROTATION_270) {
+-        data->point.x = disp->hor_res - data->point.x - 1;
+-        data->point.y = disp->ver_res - data->point.y - 1;
+-    }
+-    if(disp->rotation == LV_DISPLAY_ROTATION_90 || disp->rotation == LV_DISPLAY_ROTATION_270) {
+-        int32_t tmp = data->point.y;
+-        data->point.y = data->point.x;
+-        data->point.x = disp->ver_res - tmp - 1;
+-    }
++    switch (disp->rotation) {
++        case LV_DISPLAY_ROTATION_0:
++            break;
++        case LV_DISPLAY_ROTATION_90:
++            data->point.x = disp->ver_res - data->point.x - 1;
++            break;
++        case LV_DISPLAY_ROTATION_180:
++            data->point.x = disp->hor_res * 2 - data->point.x - 1;
++            data->point.y = disp->ver_res * 2 - data->point.y - 1;
++            break;
++        case LV_DISPLAY_ROTATION_270:
++            data->point.x = data->point.x - disp->ver_res;
++            data->point.y = disp->hor_res * 2 - data->point.y - 1;
++            break;
++    }
++
++    // if(disp->rotation == LV_DISPLAY_ROTATION_180 || disp->rotation == LV_DISPLAY_ROTATION_270) {
++    //     // data->point.x = disp->hor_res - data->point.x - 1;
++    //     // data->point.y = disp->ver_res - data->point.y - 1;
++    //     data->point.x = disp->hor_res * 2 - data->point.x - 1;
++    //     data->point.y = disp->ver_res * 2 - data->point.y - 1;
++    // }
++    // if(disp->rotation == LV_DISPLAY_ROTATION_90 || disp->rotation == LV_DISPLAY_ROTATION_270) {
++    //     int32_t tmp = data->point.y;
++    //     data->point.y = data->point.x;
++    //     data->point.x = disp->ver_res - tmp - 1;
++    // }
++
++    // LV_LOG_WARN("Rotation: %d, X: %d, Y: %d, H: %d, V: %d, RawX: %d, RawY: %d", disp->rotation, data->point.x, data->point.y, disp->hor_res, disp->ver_res, i->pointer.last_raw_point.x, i->pointer.last_raw_point.y);
+ 
+     /*Simple sanity check*/
+     if(data->point.x < 0) {
+@@ -1788,3 +1808,4 @@
+ 
+     indev->scroll_throw_anim = lv_anim_start(&a);
+ }
++

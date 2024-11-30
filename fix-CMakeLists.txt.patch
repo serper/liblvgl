@@ -1,0 +1,79 @@
+--- lvgl-9.2.2/CMakeLists.txt	2024-10-30 07:14:36.000000000 +0000
++++ lvgl-orig/CMakeLists.txt	2024-11-03 02:30:05.275203274 +0000
+@@ -2,13 +2,7 @@
+ 
+ set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+ 
+-if(NOT ESP_PLATFORM)
+-  if(NOT (CMAKE_C_COMPILER_ID STREQUAL "MSVC"))
+-    project(lvgl LANGUAGES C CXX ASM HOMEPAGE_URL https://github.com/lvgl/lvgl)
+-  else()
+-    project(lvgl LANGUAGES C CXX HOMEPAGE_URL https://github.com/lvgl/lvgl)
+-  endif()
+-endif()
++project(lvgl LANGUAGES C CXX ASM HOMEPAGE_URL https://github.com/lvgl/lvgl)
+ 
+ set(LVGL_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
+ 
+@@ -19,9 +13,46 @@
+ elseif(MICROPY_DIR)
+   include(${CMAKE_CURRENT_LIST_DIR}/env_support/cmake/micropython.cmake)
+ else()
++  # Asegúrate de que custom.cmake no intente crear la biblioteca de nuevo
++  set(LVGL_ALREADY_DEFINED TRUE)
+   include(${CMAKE_CURRENT_LIST_DIR}/env_support/cmake/custom.cmake)
+ endif()
+ 
++# Añadir estas líneas para encontrar e incluir libdrm
++find_package(PkgConfig REQUIRED)
++pkg_check_modules(LIBDRM REQUIRED libdrm)
++
++include_directories(${LIBDRM_INCLUDE_DIRS})
++link_directories(${LIBDRM_LIBRARY_DIRS})
++target_link_libraries(lvgl PUBLIC ${LIBDRM_LIBRARIES})
++
++# Añadir estas líneas para encontrar e incluir libinput
++pkg_check_modules(LIBINPUT REQUIRED libinput)
++
++include_directories(${LIBINPUT_INCLUDE_DIRS})
++link_directories(${LIBINPUT_LIBRARY_DIRS})
++target_link_libraries(lvgl PUBLIC ${LIBINPUT_LIBRARIES})
++
++# Añadir estas líneas para encontrar e incluir xkbcommon
++pkg_check_modules(XKBCOMMON REQUIRED xkbcommon)
++
++include_directories(${XKBCOMMON_INCLUDE_DIRS})
++link_directories(${XKBCOMMON_LIBRARY_DIRS})
++target_link_libraries(lvgl PUBLIC ${XKBCOMMON_LIBRARIES})
++
++# Add library: avformat, avcodec, avutil, swscale
++pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET libavformat libavcodec libavutil libswscale)
++include_directories(${LIBAV_INCLUDE_DIRS})
++link_directories(${LIBAV_LIBRARY_DIRS})
++target_link_libraries(lvgl PUBLIC PkgConfig::LIBAV)
++
++# Add library: m, z, pthread
++find_package(Threads REQUIRED)
++
++target_link_libraries(lvgl PUBLIC m)
++target_link_libraries(lvgl PUBLIC z)
++target_link_libraries(lvgl PUBLIC Threads::Threads)
++
+ #[[
+     unfortunately CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS does not work for global data. 
+     for global data we still need decl specs.
+@@ -31,10 +62,11 @@
+     For all compiled sources within the library (i.e. basically all lvgl files) we need to use dllexport.
+     For all compiled sources from outside the library (i.e. files which include lvgl headers) we need to use dllimport.
+     We can do this by using CMakes INTERFACE and PRIVATE keyword.
+-  ]]
++]]
+ if (MSVC)
+   target_compile_definitions(lvgl
+     INTERFACE LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllimport\)
+     PRIVATE LV_ATTRIBUTE_EXTERN_DATA=__declspec\(dllexport\)
+   )
+-endif()
+\ No newline at end of file
++endif()
++
