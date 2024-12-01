@@ -15,6 +15,7 @@ This project packages the LVGL library version 9.2.2 for installation and use on
 - `cmake`
 - `pkgconfig`
 - `git`
+- `SDL2`
 - `ffmpeg-dev`
 
 ## Installation
