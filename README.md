@@ -64,27 +64,68 @@ To create the APK package for Alpine Linux, follow these steps:
     abuild -r
     ```
 
-## Creación del paquete para Windows con MSYS2
+## Creating the Windows Package with MSYS2
 
-Para crear el paquete para Windows usando `makepkg` para MSYS2, sigue estos pasos:
+To create the Windows package using `makepkg` for MSYS2, follow these steps:
 
-1. Instala MSYS2 desde [msys2.org](https://www.msys2.org/) y actualiza la base de datos de paquetes:
+1. Install MSYS2 from [msys2.org](https://www.msys2.org/) and update the package database:
     ```sh
     pacman -Syu
     ```
 
-2. Instala las herramientas de construcción necesarias:
+2. Install the necessary build tools:
     ```sh
     pacman -S base-devel mingw-w64-x86_64-toolchain git
     ```
 
-3. Clona el repositorio y navega al directorio del proyecto:
+3. Clone the repository and navigate to the project directory:
     ```sh
     git clone https://github.com/serper/liblvgl.git
     cd liblvgl
     ```
+4. Download the sources and apply the patches:
+    ```sh
+    wget https://github.com/lvgl/lvgl/archive/refs/tags/v9.2.2.tar.gz -O liblvgl-9.2.2.tar.gz
+    tar -xzf liblvgl-9.2.2.tar.gz
+    cp lv_conf.h lvgl-9.2.2/
+    patch -p1 < fix-CMakeLists.txt.patch
+    patch -p1 < fix-custom.cmake.patch
+    patch -p1 < fix-lv_blend_neon.S.patch
+    ```
 
-4. Construye el paquete:
+5. Create a `PKGBUILD` file with the necessary build instructions:
+    ```sh
+    nano PKGBUILD
+    ```
+
+    Example `PKGBUILD` content:
+    ```sh
+    pkgname=liblvgl
+    pkgver=9.2.2
+    pkgrel=1
+    pkgdesc="Light and Versatile Graphics Library"
+    arch=('any')
+    url="https://github.com/lvgl/lvgl"
+    license=('MIT')
+    depends=('cmake' 'make' 'gcc')
+    source=("https://github.com/lvgl/lvgl/archive/refs/tags/v${pkgver}.tar.gz")
+    sha256sums=('SKIP')
+
+    build() {
+        cd "$srcdir/$pkgname-$pkgver"
+        mkdir build
+        cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr ..
+        make
+    }
+
+    package() {
+        cd "$srcdir/$pkgname-$pkgver/build"
+        make DESTDIR="$pkgdir/" install
+    }
+    ```
+
+4. Build the package:
     ```sh
     makepkg -si
     ```
