@@ -64,6 +64,31 @@ Para crear el paquete APK para Alpine Linux, siga estos pasos:
     abuild -r
     ```
 
+## Creación del paquete de Windows con MSYS2
+
+Para crear el paquete de Windows usando `makepkg` para MSYS2, siga estos pasos:
+
+1. Instale MSYS2 desde [msys2.org](https://www.msys2.org/) y actualice la base de datos de paquetes:
+    ```sh
+    pacman -Syu
+    ```
+
+2. Instale las herramientas de compilación necesarias:
+    ```sh
+    pacman -S base-devel mingw-w64-x86_64-toolchain git
+    ```
+
+3. Clone el repositorio y navegue al directorio del proyecto:
+    ```sh
+    git clone https://github.com/serper/liblvgl.git
+    cd liblvgl
+    ```
+
+4. Compile el paquete:
+    ```sh
+    makepkg -si
+    ```
+    
 ## Uso
 
 Después de la instalación, puede incluir LVGL en su proyecto C/C++ y comenzar a desarrollar interfaces gráficas.

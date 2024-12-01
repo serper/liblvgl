@@ -8,7 +8,7 @@ license=('MIT')
 depends=('mingw-w64-x86_64-ffmpeg')
 makedepends=('mingw-w64-x86_64-cmake' 'mingw-w64-x86_64-pkg-config' 'mingw-w64-x86_64-tools-git')
 source=("https://github.com/lvgl/lvgl/archive/refs/tags/v$pkgver.tar.gz"
-        "lv_conf.h"
+        "lv_conf_win.h"
         "fix-CMakeLists.txt.patch"
         "fix-custom.cmake.patch"
         "fix-lv_blend_neon.S.patch")
@@ -16,7 +16,7 @@ sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 prepare() {
     cd "$srcdir/lvgl-$pkgver"
-    cp "$srcdir/lv_conf.h" .
+    cp "$srcdir/lv_conf_win.h" "lv_conf.h"
     patch -p1 < "$srcdir/fix-CMakeLists.txt.patch"
     patch -p1 < "$srcdir/fix-custom.cmake.patch"
     patch -p1 < "$srcdir/fix-lv_blend_neon.S.patch"
