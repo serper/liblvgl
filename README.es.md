@@ -19,7 +19,7 @@ Este proyecto empaqueta la biblioteca LVGL versión 9.2.2 para su instalación y
 
 ## Instalación
 
-Para compilar e instalar la biblioteca, siga estos pasos:
+Para compilar e instalar la biblioteca de forma manual, siga estos pasos:
 
 1. Clone el repositorio y navegue al directorio del proyecto:
     ```sh
@@ -50,9 +50,15 @@ Para compilar e instalar la biblioteca, siga estos pasos:
 
 Para crear el paquete APK para Alpine Linux, siga estos pasos:
 
-1. Asegúrese de tener `abuild` instalado y configurado en su sistema.
+1. Clone el repositorio y navegue al directorio del proyecto:
+    ```sh
+    git clone https://github.com/serper/liblvgl.git
+    cd liblvgl
+    ```
 
-2. Ejecute los siguientes comandos en el directorio del proyecto:
+2. Asegúrese de tener `abuild` instalado y configurado en su sistema.
+
+3. Ejecute los siguientes comandos en el directorio del proyecto:
     ```sh
     abuild checksum
     abuild -r
