@@ -16,7 +16,7 @@ sha256sums=('SKIP' 'SKIP' 'SKIP' 'SKIP' 'SKIP')
 
 prepare() {
     cd "$srcdir/lvgl-$pkgver"
-    cp "$srcdir/lv_conf_win.h" "lv_conf.h"
+    cp "$srcdir/lv_conf_win.h" "$srcdir/lv_conf.h"
     patch -p1 < "$srcdir/fix-CMakeLists.txt.patch"
     patch -p1 < "$srcdir/fix-custom.cmake.patch"
     patch -p1 < "$srcdir/fix-lv_blend_neon.S.patch"
@@ -26,11 +26,11 @@ build() {
     cd "$srcdir/lvgl-$pkgver"
     mkdir -p build
     cd build
-    cmake -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/mingw64 -DLV_CONF_BUILD_DISABLE_DEMOS=0 -DLV_CONF_BUILD_DISABLE_EXAMPLES=0 ..
+    cmake -G "MSYS Makefiles" -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$MINGW_PREFIX -DLV_CONF_BUILD_DISABLE_DEMOS=0 -DLV_CONF_BUILD_DISABLE_EXAMPLES=0 -DLV_CONF_PATH="$srcdir/lv_conf.h" ..
     make
 }
 
 package() {
     cd "$srcdir/lvgl-$pkgver/build"
-    make DESTDIR="$pkgdir" install
+    make DESTDIR="$pkgdir/mingw64" install
 }
