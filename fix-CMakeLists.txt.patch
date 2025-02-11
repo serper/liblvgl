@@ -86,12 +86,12 @@
 +  target_link_libraries(lvgl PUBLIC ${XKBCOMMON_LIBRARIES})
 +endif()
 +
-+# Excepto en linux arquitectura ARM incluir SD2
-+if (NOT (UNIX AND ARM))
++# Excepto en linux arquitectura ARM incluir SDL2
++if (NOT (UNIX AND (CMAKE_SYSTEM_PROCESSOR MATCHES "^arm")))
 +  # Añadir libreria SDL2
-+  find_package(SDL2 REQUIRED)
-+  include_directories(${SDL2_INCLUDE_DIRS})
-+  target_link_libraries(lvgl PUBLIC ${SDL2_LIBRARIES})
++    find_package(SDL2 REQUIRED)
++    include_directories(${SDL2_INCLUDE_DIRS})
++    target_link_libraries(lvgl PUBLIC ${SDL2_LIBRARIES})
 +endif()
 +
 +# Add library: avformat, avcodec, avutil, swscale
